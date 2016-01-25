@@ -1,5 +1,5 @@
 /*
- * setup.h
+ * stp.h
  *
  * Created: 17/01/2016 12:23:05
  *  Author: Adolfina

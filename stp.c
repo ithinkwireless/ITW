@@ -1,5 +1,5 @@
 /*
- * setup.c
+ * stp.c
  *
  * Created: 17/01/2016 12:22:53
  *  Author: Adolfina
