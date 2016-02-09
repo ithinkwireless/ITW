@@ -32,7 +32,6 @@ static NWK_DataReq_t appDataReq;
 static bool appDataReqBusy = false;
 static uint8_t appBuffer[APP_BUFFER_SIZE];
 static uint8_t appBufferPtr = 0;
-static bool newCommand = false;
 
 void (*interfaceStart)(void);
 bool (*byteAvailable)(void);
