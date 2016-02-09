@@ -91,32 +91,16 @@ static void APP_TaskHandler(void)
 {
 	while (byteAvailable())
 	{
-	  // Viene letto il primo byte e memorizzato nel buffer.
-	  // Questo byte rappresenta la lunghezza in bytes del pacchetto.
-	  
 	  appBuffer[appBufferPtr] = byteRead();
-	  
-	  // appUartBufferPtr rappresenta l'indice dell'elemento di array in cui viene memorizzato il byte arrivato.
-	  // Quando appUartBufferPtr diventa uguale alla lunghezza del pacchetto (contenuta nel primo byte ricevuto) meno 1
-	  // significa che il pacchetto è completo. 
-
-	  if (appBufferPtr == (appBuffer[PACKET_LENGHT_BYTE] - 1))
-		{
-			newCommand = true;
-		}
-	  else
-		{
-			appBufferPtr++;
-		}
+	  appBufferPtr++;
 	}
 	
-	if (newCommand && checkPacket())
+	if (checkPacket())
 	{
 		switch(appBuffer[MESSAGE_ID_BYTE])
 		{
 			case SEND_DATA_MESSAGEID:
 			{
-				//uint16_t addr = ((appBuffer[2] << 8) | appBuffer[3]);
 				uint16_t addr;
 				
 				memcpy(&addr, &appBuffer[ADDRESS_MSB_BYTE], 2);
@@ -137,7 +121,12 @@ static void APP_TaskHandler(void)
 			}
 			break;
 		}
-		newCommand = false;
+		
+		for (uint8_t i = 0; i < appBufferPtr; i++)
+		{
+			byteWrite(appBuffer[i]);
+		}
+		
 		appBufferPtr = 0;
 	}
 }
