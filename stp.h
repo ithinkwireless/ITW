@@ -11,12 +11,19 @@
 
 #define EEPROM_PAGE 0
 
-enum modulation {
+enum MODULATION {
 	BPSK_20,
 	BPSK_40 = 0b00000100,
 	OQPSK_SIN_RC_100 = 0b00001000,
 	OQPSK_SIN_250 = 0b00001100,
 	OQPSK_RC_250 = 0b00011100
+};
+
+enum INTERFACE {
+	isUSB,
+	isUART,
+	isSPI,
+	isI2C	
 };
 
 typedef struct{
@@ -27,7 +34,7 @@ typedef struct{
 	uint8_t modulation;
 	uint8_t txpower;
 	char securityKey[17];
-	bool isUart;
+	uint8_t interface;
 }settings_t;
 
 settings_t settings;

@@ -75,15 +75,27 @@ void writeValue(settings_t *values)
 {
 	char interfaceValue[7];
 	
-	if (values->isUart)
+	switch (values->interface)
 	{
+		case isUART:
 		strcpy(interfaceValue, "SERIAL");
 		interfaceValue[6] = '\0';
-	}
-	else
-	{
+		break;
+		
+		case isUSB:
 		strcpy(interfaceValue, "USB");
-		interfaceValue[3] = '\0';
+		interfaceValue[6] = '\0';
+		break;
+		
+		case isSPI:
+		strcpy(interfaceValue, "SPI");
+		interfaceValue[6] = '\0';
+		break;
+		
+		case isI2C:
+		strcpy(interfaceValue, "I2C");
+		interfaceValue[6] = '\0';
+		break;
 	}
 	
 	char modValue[17];
@@ -322,22 +334,23 @@ void setSecurity(int arg_cnt, char **args)
 
 void setInterface(int arg_cnt, char **args)
 {
-	if (arg_cnt == 1)
+	/*if (arg_cnt == 1)
 	{
 		chb_cmd_putmsg_PROGMEM(interfaceHELP);
 	} else
 		{
 			if (!strcmp(args[1], "serial"))
 				{
-					settings.isUart = true;
+					settings.interface = true;
 					chb_cmd_putmsg_PROGMEM(commandOK);
 				} else if (!strcmp(args[1], "usb"))
 					{
-						settings.isUart = false;
+						settings.interface = false;
 						chb_cmd_putmsg_PROGMEM(commandOK);
 					} else
 						chb_cmd_putmsg_PROGMEM(commandERROR);
-	}
+	}*/
+	// DA RIVEDERE PER CAMBIO STRUTTURA SULLE POSSIBILI INTERFACCE
 }
 
 void setEEPROM(int arg_cnt, char **args)

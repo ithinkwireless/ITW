@@ -46,7 +46,7 @@ void APP_Init(void)
 	
 	NWK_OpenEndpoint(APP_ENDPOINT, appDataInd);
 	
-	if (EEPROM.isUart)
+	if (EEPROM.interface)
 	{
 		interfaceStart = uart_start;
 		byteAvailable = uart_is_rx_ready;
