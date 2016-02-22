@@ -36,6 +36,7 @@ void APP_Init(void)
 	}
 	
 	NWK_SetAddr(EEPROM.address);
+	
 	NWK_SetPanId(EEPROM.panid);
 	PHY_SetBand(EEPROM.band);
 	PHY_SetChannel(EEPROM.channel);
@@ -46,19 +47,21 @@ void APP_Init(void)
 	
 	NWK_OpenEndpoint(APP_ENDPOINT, appDataInd);
 	
-	if (EEPROM.interface)
+	switch(EEPROM.interface)
 	{
-		interfaceStart = uart_start;
-		byteAvailable = uart_is_rx_ready;
-		byteWrite = uart_putc;
-		byteRead = uart_getc;
-	}
-	else
-	{
-		interfaceStart = udc_start;
-		byteAvailable = udi_cdc_is_rx_ready;
-		byteWrite = udi_cdc_putc;
-		byteRead = udi_cdc_getc;
+		case isUART:
+			interfaceStart = uart_start;
+			byteAvailable = uart_is_rx_ready;
+			byteWrite = uart_putc;
+			byteRead = uart_getc;
+		break;
+		
+		case isUSB:
+			interfaceStart = udc_start;
+			byteAvailable = udi_cdc_is_rx_ready;
+			byteWrite = udi_cdc_putc;
+			byteRead = udi_cdc_getc;
+		break;
 	}
 	
 	interfaceStart();

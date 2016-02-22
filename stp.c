@@ -334,22 +334,22 @@ void setSecurity(int arg_cnt, char **args)
 
 void setInterface(int arg_cnt, char **args)
 {
-	/*if (arg_cnt == 1)
+	if (arg_cnt == 1)
 	{
 		chb_cmd_putmsg_PROGMEM(interfaceHELP);
 	} else
 		{
 			if (!strcmp(args[1], "serial"))
 				{
-					settings.interface = true;
+					settings.interface = isUART;
 					chb_cmd_putmsg_PROGMEM(commandOK);
 				} else if (!strcmp(args[1], "usb"))
 					{
-						settings.interface = false;
+						settings.interface = isUSB;
 						chb_cmd_putmsg_PROGMEM(commandOK);
 					} else
 						chb_cmd_putmsg_PROGMEM(commandERROR);
-	}*/
+	}
 	// DA RIVEDERE PER CAMBIO STRUTTURA SULLE POSSIBILI INTERFACCE
 }
 
