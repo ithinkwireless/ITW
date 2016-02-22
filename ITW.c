@@ -7,6 +7,7 @@
 #include "phy.h"
 #include "nwk.h"
 #include "uart.h"
+#include "mySPI.h"
 #include "ITW.h"
 
 static void appDataConf(NWK_DataReq_t *req)
@@ -61,6 +62,13 @@ void APP_Init(void)
 			byteAvailable = udi_cdc_is_rx_ready;
 			byteWrite = udi_cdc_putc;
 			byteRead = udi_cdc_getc;
+		break;
+		
+		case isSPI:
+			interfaceStart = mySPI_start;
+			byteAvailable = mySPI_is_rx_ready;
+			byteWrite = mySPI_putc;
+			byteRead = mySPI_getc;
 		break;
 	}
 	
@@ -124,12 +132,7 @@ static void APP_TaskHandler(void)
 			}
 			break;
 		}
-		
-		for (uint8_t i = 0; i < appBufferPtr; i++)
-		{
-			byteWrite(appBuffer[i]);
-		}
-		
+
 		appBufferPtr = 0;
 	}
 }
