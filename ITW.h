@@ -33,7 +33,7 @@ static bool appDataReqBusy = false;
 static uint8_t appBuffer[APP_BUFFER_SIZE];
 static uint8_t appBufferPtr = 0;
 
-void (*interfaceStart)(void);
+//void (*interfaceStart)(void);
 bool (*byteAvailable)(void);
 int (*byteWrite)(int value);
 int (*byteRead)(void);

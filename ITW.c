@@ -9,6 +9,9 @@
 #include "uart.h"
 #include "mySPI.h"
 #include "ITW.h"
+#include "nvm.h"
+
+bool newCommand = false;
 
 static void appDataConf(NWK_DataReq_t *req)
 {
@@ -17,13 +20,30 @@ static void appDataConf(NWK_DataReq_t *req)
 }
 
 static bool appDataInd(NWK_DataInd_t *ind)
-// Questa funzione viene chiamata dallo stack quando l'AT86RF212B riceve dati.
 {
-	// Vengono inviati i dati del pacchetto ricevuto.
 	for (uint8_t i = 0; i < ind->size; i++)
 	{
 		byteWrite(ind->data[i]);
 	}
+	return true;
+}
+
+static bool SPIappDataInd(NWK_DataInd_t *ind)
+{
+	uint8_t i = 0;
+	
+	gpio_set_pin_high(GPIO_DATAPIN);
+	
+	while (!byteAvailable()) { }
+		
+	while (byteAvailable())
+	{
+		byteWrite(ind->data[i]);
+		i++;
+	}
+	
+	gpio_set_pin_low(GPIO_DATAPIN);
+	
 	return true;
 }
 
@@ -37,7 +57,6 @@ void APP_Init(void)
 	}
 	
 	NWK_SetAddr(EEPROM.address);
-	
 	NWK_SetPanId(EEPROM.panid);
 	PHY_SetBand(EEPROM.band);
 	PHY_SetChannel(EEPROM.channel);
@@ -46,33 +65,39 @@ void APP_Init(void)
 	PHY_SetRxState(true);
 	NWK_SetSecurityKey((uint8_t *)EEPROM.securityKey);
 	
-	NWK_OpenEndpoint(APP_ENDPOINT, appDataInd);
-	
 	switch(EEPROM.interface)
 	{
 		case isUART:
-			interfaceStart = uart_start;
-			byteAvailable = uart_is_rx_ready;
-			byteWrite = uart_putc;
-			byteRead = uart_getc;
+		byteAvailable = uart_is_rx_ready;
+		byteWrite = uart_putc;
+		byteRead = uart_getc;
+		
+		NWK_OpenEndpoint(APP_ENDPOINT, appDataInd);
+		uart_start();
 		break;
 		
 		case isUSB:
-			interfaceStart = udc_start;
-			byteAvailable = udi_cdc_is_rx_ready;
-			byteWrite = udi_cdc_putc;
-			byteRead = udi_cdc_getc;
+		byteAvailable = udi_cdc_is_rx_ready;
+		byteWrite = udi_cdc_putc;
+		byteRead = udi_cdc_getc;
+		
+		NWK_OpenEndpoint(APP_ENDPOINT, appDataInd);
+		udc_start();
 		break;
 		
 		case isSPI:
-			interfaceStart = mySPI_start;
-			byteAvailable = mySPI_is_rx_ready;
-			byteWrite = mySPI_putc;
-			byteRead = mySPI_getc;
+		byteAvailable = mySPI_is_rx_ready;
+		byteWrite = mySPI_putc;
+		byteRead = mySPI_getc;
+		
+		NWK_OpenEndpoint(APP_ENDPOINT, SPIappDataInd);
+		mySPI_start();
+		break;
+		
+		default:
+		udc_start();
 		break;
 	}
-	
-	interfaceStart();
 }
 
 static bool checkPacket(void)
@@ -103,10 +128,18 @@ static void APP_TaskHandler(void)
 	while (byteAvailable())
 	{
 	  appBuffer[appBufferPtr] = byteRead();
-	  appBufferPtr++;
+	  
+	  if (appBufferPtr == (appBuffer[PACKET_LENGHT_BYTE] - 1))
+	  {
+		  newCommand = true;
+	  }
+	  else
+	  {
+		  appBufferPtr++;
+	  }
 	}
 	
-	if (checkPacket())
+	if (checkPacket() & newCommand)
 	{
 		switch(appBuffer[MESSAGE_ID_BYTE])
 		{
@@ -134,6 +167,7 @@ static void APP_TaskHandler(void)
 		}
 
 		appBufferPtr = 0;
+		newCommand = false;
 	}
 }
 
@@ -146,7 +180,7 @@ int main (void)
 	
 	SYS_Init();
 	APP_Init();
-				
+
 	while (1)
 		{
 			if (gpio_pin_is_low(GPIO_PUSH_BUTTON_1))
