@@ -21,9 +21,7 @@ enum MODULATION {
 
 enum INTERFACE {
 	isUSB,
-	isUART,
-	isSPI,
-	isI2C	
+	isUART	
 };
 
 typedef struct{
