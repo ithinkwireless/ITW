@@ -28,25 +28,6 @@ static bool appDataInd(NWK_DataInd_t *ind)
 	return true;
 }
 
-static bool SPIappDataInd(NWK_DataInd_t *ind)
-{
-	uint8_t i = 0;
-	
-	gpio_set_pin_high(GPIO_DATAPIN);
-	
-	while (!byteAvailable()) { }
-		
-	while (byteAvailable())
-	{
-		byteWrite(ind->data[i]);
-		i++;
-	}
-	
-	gpio_set_pin_low(GPIO_DATAPIN);
-	
-	return true;
-}
-
 void APP_Init(void)
 {
 	settings_t EEPROM;
@@ -83,15 +64,6 @@ void APP_Init(void)
 		
 		NWK_OpenEndpoint(APP_ENDPOINT, appDataInd);
 		udc_start();
-		break;
-		
-		case isSPI:
-		byteAvailable = mySPI_is_rx_ready;
-		byteWrite = mySPI_putc;
-		byteRead = mySPI_getc;
-		
-		NWK_OpenEndpoint(APP_ENDPOINT, SPIappDataInd);
-		mySPI_start();
 		break;
 		
 		default:
