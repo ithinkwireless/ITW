@@ -86,16 +86,6 @@ void writeValue(settings_t *values)
 		strcpy(interfaceValue, "USB");
 		interfaceValue[6] = '\0';
 		break;
-		
-		case isSPI:
-		strcpy(interfaceValue, "SPI");
-		interfaceValue[6] = '\0';
-		break;
-		
-		case isI2C:
-		strcpy(interfaceValue, "I2C");
-		interfaceValue[6] = '\0';
-		break;
 	}
 	
 	char modValue[17];
